@@ -1,1 +1,20 @@
+# Скомпилированные бинарники
 fermer
+fermer
+*.o
+*.out
+*.exe
+*.a
+*.so
+
+# Служебные папки и файлы IDE
+.vscode/
+.vs/
+.idea/
+
+# Системный мусор
+*.swp
+*~
+.DS_Store
+fermer
+
