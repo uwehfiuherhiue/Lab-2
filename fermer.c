@@ -1,9 +1,10 @@
 #include <stdio.h>
+
 #define INVENTORY_SIZE 10
 
 int current_day = 1;
 int current_hour = 8;
-int inventory[10] = {0};
+int inventory[INVENTORY_SIZE] = {0};
 
 const char* item_names[] = {
     "Пусто",
@@ -24,6 +25,7 @@ void view_inventory();
 void put_item();
 void remove_item();
 void clear_trash();
+void compress_inventory();  // новая функция
 
 int main() {
     int choice;
@@ -36,6 +38,7 @@ int main() {
         printf("[4] Положить предмет в слот\n");
         printf("[5] Выбросить предмет\n");
         printf("[6] Очистка от мусора\n");
+        printf("[7] Сжать инвентарь (сортировка рюкзака)\n");  // новый пункт
         printf("Выберите пункт: ");
         scanf("%d", &choice);
 
@@ -60,6 +63,9 @@ int main() {
                 break;
             case 6:
                 clear_trash();
+                break;
+            case 7:
+                compress_inventory();
                 break;
             default:
                 printf("Некорректный выбор.\n");
@@ -88,7 +94,7 @@ void work_hours() {
 }
 
 void view_inventory() {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < INVENTORY_SIZE; i++) {
         printf("Слот %d: [%d]", i, inventory[i]);
         if (inventory[i] >= 1 && inventory[i] <= 9) {
             printf(" (%s)", item_names[inventory[i]]);
@@ -99,9 +105,9 @@ void view_inventory() {
 
 void put_item() {
     int index, item_id;
-    printf("Введите индекс слота (0-%d): ", 10 - 1);
+    printf("Введите индекс слота (0-%d): ", INVENTORY_SIZE - 1);
     scanf("%d", &index);
-    if (index < 0 || index >= 10) {
+    if (index < 0 || index >= INVENTORY_SIZE) {
         printf("Некорректный индекс.\n");
         return;
     }
@@ -117,20 +123,21 @@ void put_item() {
 
 void remove_item() {
     int index;
-    printf("Введите индекс слота (0-%d): ", 10 - 1);
+    printf("Введите индекс слота (0-%d): ", INVENTORY_SIZE - 1);
     scanf("%d", &index);
-    if (index < 0 || index >= 10) {
+    if (index < 0 || index >= INVENTORY_SIZE) {
         printf("Некорректный индекс.\n");
         return;
     }
     inventory[index] = 0;
+    printf("Предмет удалён из слота %d.\n", index);
 }
 
 void clear_trash() {
     int item_id, count = 0;
     printf("Введите ID предмета для удаления: ");
     scanf("%d", &item_id);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < INVENTORY_SIZE; i++) {
         if (inventory[i] == item_id) {
             inventory[i] = 0;
             count++;
@@ -138,3 +145,27 @@ void clear_trash() {
     }
     printf("Удалено %d предметов.\n", count);
 }
+
+// Новая функция: сжатие инвентаря
+void compress_inventory() {
+    printf("Инвентарь ДО сжатия:\n");
+    view_inventory();
+
+    int write = 0;  // позиция для записи ненулевых элементов
+    // Проходим по массиву и сдвигаем все ненулевые элементы в начало
+    for (int read = 0; read < INVENTORY_SIZE; read++) {
+        if (inventory[read] != 0) {
+            inventory[write] = inventory[read];
+            write++;
+        }
+    }
+    // Заполняем оставшиеся слоты нулями
+    while (write < INVENTORY_SIZE) {
+        inventory[write] = 0;
+        write++;
+    }
+
+    printf("Инвентарь ПОСЛЕ сжатия:\n");
+    view_inventory();
+}
+
