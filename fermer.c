@@ -157,26 +157,29 @@ void start_adventure() {
             continue;
         }
 
-        // --- ЛЕСТНИЦА ВВЕРХ (НОВЫЙ БЛОК) ---
+        // --- ЛЕСТНИЦА ВВЕРХ ---
         if (target == 'U') {
             printf("Вы нашли лестницу наверх! Поднимаетесь...\n");
             free_map(map);
             depth--;
-            if (depth < 1) depth = 1; // защита от ухода ниже 1-го этажа
+            if (depth < 1) depth = 1;
             map = generate_floor(depth);
             if (!map) return;
             printf("Глубина: %d\n", depth);
             continue;
         }
 
-        // --- ЛОГИКА ХРУПКОГО ПОЛА ---
+        // --- ЛОГИКА ХРУПКОГО ПОЛА (ИСПРАВЛЕНА) ---
         if (map->traps[next_y][next_x] == 'T') {
-            if (map->grid[next_y][next_x] == '.') {
+            if (map->grid[next_y][next_x] == '.' || map->grid[next_y][next_x] == '@') {
                 // ПЕРВЫЙ ШАГ
+                // 1. Очищаем старую клетку (если там был хрупкий пол — ставим ',')
                 map->grid[old_y][old_x] = (map->traps[old_y][old_x] == 'T') ? ',' : '.';
+                // 2. Двигаем игрока
                 map->player_x = next_x;
                 map->player_y = next_y;
-                map->grid[next_y][next_x] = ','; 
+                // 3. Ставим игрока на новую клетку (ВСЕГДА '@')
+                map->grid[next_y][next_x] = '@'; 
                 printf("\nОсторожно, скрипучий пол!\n");
                 continue;
             } else if (map->grid[next_y][next_x] == ',') {
@@ -184,9 +187,12 @@ void start_adventure() {
                 int chance = rand() % 100;
                 if (chance < 50) {
                     printf("\nПол скрипит! Вы прошли дальше.\n");
+                    // 1. Очищаем старую клетку
                     map->grid[old_y][old_x] = (map->traps[old_y][old_x] == 'T') ? ',' : '.';
+                    // 2. Двигаем игрока
                     map->player_x = next_x;
                     map->player_y = next_y;
+                    // 3. Ставим игрока на новую клетку
                     map->grid[next_y][next_x] = '@';
                 } else {
                     printf("\nПол с треском проломился! Вы падаете на этаж ниже...\n");
@@ -201,10 +207,13 @@ void start_adventure() {
         } else {
             // Обычный шаг (не на ловушку)
             if (target != 'U') {
+                // 1. Очищаем старую клетку
                 map->grid[old_y][old_x] = (map->traps[old_y][old_x] == 'T') ? ',' : '.';
             }
+            // 2. Двигаем игрока
             map->player_x = next_x;
             map->player_y = next_y;
+            // 3. Ставим игрока на новую клетку
             map->grid[next_y][next_x] = '@';
         }
     }
