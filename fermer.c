@@ -146,10 +146,23 @@ void start_adventure() {
             continue;
         }
 
+        // --- ЛЕСТНИЦА ВНИЗ ---
         if (target == 'D') {
             printf("Вы нашли лестницу вниз! Переход на следующий этаж...\n");
             free_map(map);
             depth++;
+            map = generate_floor(depth);
+            if (!map) return;
+            printf("Глубина: %d\n", depth);
+            continue;
+        }
+
+        // --- ЛЕСТНИЦА ВВЕРХ (НОВЫЙ БЛОК) ---
+        if (target == 'U') {
+            printf("Вы нашли лестницу наверх! Поднимаетесь...\n");
+            free_map(map);
+            depth--;
+            if (depth < 1) depth = 1; // защита от ухода ниже 1-го этажа
             map = generate_floor(depth);
             if (!map) return;
             printf("Глубина: %d\n", depth);
